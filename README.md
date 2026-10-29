@@ -16,6 +16,7 @@ az version
 az login --use-device-code
 az account show -o table
 az group list -o table
+az logout
 ```
 
 Podmanを使う場合は`podman pull`で取得します。エンジン未指定時はPodman、Dockerの順でコマンドの存在を確認します。起動状況による自動切替はしません。
