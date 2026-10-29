@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
+export AZ_CONTAINER_SHELL=1
+exec "$script_dir/az-container" "$@"

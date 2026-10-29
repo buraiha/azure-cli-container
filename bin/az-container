@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Bash 3.2 compatible (including the Bash shipped with macOS).
+fail() { printf 'az-container: %s\n' "$*" >&2; exit 1; }
+engine=${AZ_CONTAINER_ENGINE:-}
+if [[ -z "$engine" ]]; then
+    if command -v podman >/dev/null 2>&1; then engine=podman
+    elif command -v docker >/dev/null 2>&1; then engine=docker
+    else fail 'DockerまたはPodmanをインストールしてください。'; fi
+fi
+case "$engine" in docker|podman) ;; *) fail 'AZ_CONTAINER_ENGINE は docker または podman を指定してください。';; esac
+command -v "$engine" >/dev/null 2>&1 || fail "$engine が見つかりません。"
+image=${AZ_CONTAINER_IMAGE:-mcr.microsoft.com/azure-cli:azurelinux3.0}
+[[ "$image" != -* && "$image" != *[[:space:]]* ]] || fail 'イメージ名が不正です。'
+config=${AZ_CONTAINER_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/azure-cli-container}
+[[ "$config" = /* ]] || fail '設定ディレクトリには絶対パスを指定してください。'
+[[ ! -L "$config" ]] || fail '設定ディレクトリのシンボリックリンクは利用できません。'
+umask 077
+mkdir -p "$config"
+config=$(cd "$config" && pwd -P)
+workspace=$(pwd -P)
+[[ -O "$config" ]] || fail '設定ディレクトリの所有者を確認してください。'
+[[ "$config" != / && "$config" != "$HOME" && "$config" != "$workspace" ]] || fail '設定には専用ディレクトリを指定してください。'
+case "$config/" in "$workspace/"*) fail '認証情報は作業ディレクトリの外に保存してください。';; esac
+# --mount has comma-delimited syntax; reject rather than misparse unusual paths.
+[[ "$config$workspace" != *,* && "$config$workspace" != *$'\n'* ]] || fail 'パスにカンマや改行は使用できません。'
+chmod 700 "$config"
+args=(run --rm -i)
+if [[ -t 0 && -t 1 ]]; then args+=(-t); fi
+if [[ "$engine" = podman ]]; then args+=(--userns=keep-id); fi
+args+=(--user "$(id -u):$(id -g)"
+    --env HOME=/tmp/az-home --env AZURE_CONFIG_DIR=/tmp/az-home/.azure
+    --mount "type=bind,src=$config,dst=/tmp/az-home/.azure"
+    --mount "type=bind,src=$workspace,dst=/workspace"
+    --workdir /workspace)
+if [[ "${AZ_CONTAINER_SHELL:-0}" = 1 ]]; then
+    args+=(--entrypoint /bin/bash "$image" "$@")
+else
+    args+=(--entrypoint /usr/bin/az "$image" "$@")
+fi
+exec "$engine" "${args[@]}"

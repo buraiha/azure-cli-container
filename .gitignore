@@ -1,0 +1,15 @@
+.azure/
+.config/
+.env
+.env.*
+!.env.example
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+.terraform/
+*.pem
+*.key
+*.pfx
+*.log
+.DS_Store
