@@ -10,3 +10,9 @@
 - 公開対象の秘密情報パターン検査、Git差分チェック: 成功。
 
 Docker daemonは停止中のためDocker実機試験は未実施。Docker経路は偽エンジンによる引数テストのみ。WSL2/Linux、SELinux、実端末TTY操作は実機未検証。Azureへのログイン・API操作・リソース作成は行っていません。
+
+## コピー式インストールへの変更
+
+`bash tests/install.sh`で実体コピー、再インストール、既存リンクからの移行、無関係なコマンドの保護を確認。テスト用clone先を削除した後も、インストールした`az`と`az-shell`が動くことを偽エンジンで検証します。
+
+macOS + Podmanでは隔離したインストール先にコピーし、配布元を削除した後の`az version`と`az-shell -c 'az version'`も実行して成功（Azure CLI 2.90.0）。

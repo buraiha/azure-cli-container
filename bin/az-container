@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Managed by azure-cli-container installer
 set -euo pipefail
 
 # Bash 3.2 compatible (including the Bash shipped with macOS).

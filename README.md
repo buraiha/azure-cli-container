@@ -7,7 +7,7 @@ WSL2 / Linux / macOSのBashからMicrosoft公式Azure CLIコンテナを実行�
 ```bash
 git clone https://github.com/buraiha/azure-cli-container.git
 cd azure-cli-container
-./bin/install-alias.sh
+./bin/install.sh
 export PATH="$HOME/.local/bin:$PATH"
 export AZ_CONTAINER_ENGINE=docker  # Podmanの場合はpodman
 
@@ -25,7 +25,9 @@ Podmanを使う場合は`podman pull`で取得します。エンジン未指定�
 - [使用方法・設定](docs/usage.md)
 - [トラブル対応](docs/troubleshooting.md)
 
-`bin/install-alias.sh`は`~/.local/bin`に`az`、`az-container`、`az-shell`のリンクを作ります。既存の別ファイルは上書きしません。シェル設定は変更しません。リポジトリを移動するとリンクの再設定が必要です。
+`bin/install.sh`は`~/.local/bin`に`az-container`、`az-shell`の実体をコピーし、`az → az-container`の相対リンクを作ります。インストール後はclone先を削除・移動しても使えます。削除は任意で、自動削除しません。
+
+このツールが管理する旧版はバックアップを残して更新します。無関係な既存ファイルは上書きしません。シェル設定は変更しません。旧名`bin/install-alias.sh`でも同じコピー式インストーラーを呼び出せます。
 
 認証キャッシュは作業フォルダ外の専用ディレクトリに保存します。現在の作業フォルダはコンテナから読み書きできます。Azureの操作前には対象サブスクリプションを確認してください。
 
@@ -33,6 +35,7 @@ Podmanを使う場合は`podman pull`で取得します。エンジン未指定�
 
 ```bash
 bash tests/wrapper.sh
+bash tests/install.sh
 ```
 
 引数、空白を含むパス、標準入力、終了コード、インストールの衝突防止を偽のエンジンで検証します。Azureへのログインやリソース操作は行いません。実機検証結果は[検証記録](docs/validation.md)参照。

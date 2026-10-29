@@ -15,7 +15,7 @@ printf '%s' '{}' | az rest --method post --url '<対象URL>' --body @-
 | AZ_CONTAINER_ENGINE | docker / podman。未指定はPodman優先 |
 | AZ_CONTAINER_IMAGE | 公式Azure Linuxイメージを標準とし、バージョン/digest指定も可能 |
 | AZ_CONTAINER_CONFIG_DIR | 認証・設定用の専用絶対パス |
-| AZ_CONTAINER_BIN_DIR | インストール先。標準は~/.local/bin |
+| AZ_CONTAINER_BIN_DIR | コピー先。標準は~/.local/bin |
 
 `az-shell`は同じマウント・ユーザーでBashを起動します。`az-shell -c 'az version'`も利用できます。Podmanは`--userns=keep-id`を使用します。追加の秘密・プロキシ変数やマウントは自動転送しません。信頼できるイメージだけを指定してください。
 
